@@ -41,14 +41,19 @@ ${companyData}`,
     let content = response.choices[0].message.content;
 
     // Strip markdown code fences if model ignored the system prompt
-    content = content
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/```\s*$/i, "")
-      .trim();
+// Strip <think>...</think> blocks that Qwen models prepend
+content = content.replace(/<think>[\s\S]*?<\/think>/i, "").trim();
 
-    // Extract JSON if there's any surrounding text
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
+// Strip markdown code fences if model ignored the system prompt
+content = content
+  .replace(/^```json\s*/i, "")
+  .replace(/^```\s*/i, "")
+  .replace(/```\s*$/i, "")
+  .trim();
+
+// Extract JSON if there's any surrounding text
+const jsonMatch = content.match(/\{[\s\S]*\}/);
+    
     if (jsonMatch) {
       content = jsonMatch[0];
     }
